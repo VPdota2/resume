@@ -1,81 +1,503 @@
-% !TEX program = xelatex
+% !TEX program = pdflatex
 
-\documentclass{resume}
-%\usepackage{zh_CN-Adobefonts_external} % Simplified Chinese Support using external fonts (./fonts/zh_CN-Adobe/)
-%\usepackage{zh_CN-Adobefonts_internal} % Simplified Chinese Support using system fonts
+\documentclass{beamer}
+\usepackage{graphicx}
+\usepackage{graphics}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{color}
+\usepackage[english]{babel}
+\usepackage{subfigure}
+\usepackage{verbatim}
+
+
+\newenvironment{wideitemize}{\itemize\addtolength{\itemsep}{10pt}}{\enditemize}
+
+\mode<presentation>
+{
+\usetheme{UK}
+\setbeamercovered{transparent = 28}
+}
+
+\def\vec#1{\mathchoice{\mbox{\boldmath$\displaystyle\bf#1$}}
+{\mbox{\boldmath$\textstyle\bf#1$}}
+{\mbox{\boldmath$\scriptstyle\bf#1$}}
+{\mbox{\boldmath$\scriptscriptstyle\bf#1$}}}
+
+
+
+
+\title{STA 661: Project}
+\subtitle{Nonlinear Dimension Reduction and Manifold Learning}
+\author{Sheng Yuan}\institute{University of Kentucky}
+\date{05-01-2018}
+
 
 \begin{document}
-\pagenumbering{gobble} % suppress displaying page number
 
-\name{Sheng Yuan}
+%%\begin{withoutheadline}
+%\begin{frame}[plain]
+%%\begin{frame}
+%%\titlepage
+%%\end{frame}
+%%\end{withoutheadline}
 
-\basicInfo{
-  \email{} \textperiodcentered\ 
-  \phone{} \ }
+{
 
-\section{\faGraduationCap\ Education}
-\datedsubsection{\textbf{University of XXXX}, xxxx, U.S.}{2018 -- Present}
-\textit{Ph.D.} in Statistics, expected May 2021
-\datedsubsection{\textbf{University of XXXX}, XXXX, U.S.}{2016 -- 2018}
-\textit{Master of Science} in Statistics
-\datedsubsection{\textbf{XXXX University}, XXXX, China}{2011 -- 2015}
-\textit{B.S.} in Statistics
-
-\section{\faCogs\ Skills}
-\begin{itemize}[parsep=0.5ex]
-  \item Programming Languages: R == SAS == JMP> Python > SQL
-  \item Data Skill: Big data analysis, Machine Learning, Deep Learning
-\end{itemize}
+\begin{withoutheadline}
+	\begin{frame}
+        \titlepage
+    \end{frame} 
+\end{withoutheadline}
+} 
 
 
-\section{\faUsers\ Projects}
-\datedsubsection{\textbf{Adding variability to Deep Neural Network}}{ July 2019 -- Present}
-\role{Python, Pytorch, Tensorflow, Linux}{Individual Project}
+
+{
+   \begin{frame}
+       \frametitle{Outline}
+       \tableofcontents
+   \end{frame}
+}
+
+
+
+\AtBeginSection[]
+{
+   \begin{frame}
+       \frametitle{Outline}
+       \tableofcontents[currentsection]
+   \end{frame}
+}
+
+\section{Introduction}
+
+\begin{frame}
+
+\frametitle{Introduction}
+We can do analysis on linear lower-dimensional subspace (called a manifold) and do learning through that
+data using the PCA method. \newline \newline
+We are now interested in data nonlinear low-dimensional manifold, where the structure and dimensionality we both assumed unknown.
+\end{frame}
+
+\begin{frame}
+
+\frametitle{KPCA}
+
+We have studied 
 \begin{itemize}
-  \item Using Bayesian method (variationsl inference, etc.) to add variability on the parameters of deep neural networks, such as CNN and GAN models, and build 'confidence interval' like what we have done in statistic model. 
-  \item Using Bayesian method in deep learning to avoid overfitting, and compare with other method like dropout or L1(L2) regularizations.
-\end{itemize}
+  \item Polynomial PCA(special case of KPCA).
+  \item Kernel PCA
+  \end{itemize}
+\end{frame}
 
-\datedsubsection{\textbf{111: Assessment Of Adult Non-trauma Icu Transfer Requests In Kentucky Using Publicly Available Data}}{May. 2018 -- Jan. 2019}
-\role{Second Author}{Collabrate with xxxx}
-Accepted by XXXXXXXXXXXX: January 2019 - Volume 47 - Issue 1 - p 38
+\begin{frame}
+\frametitle{Principle Curves and Surface}
+A nonlinear version of PCA.\newline
+Principle curve is a parameterized curve $\textbf{f}$ passes through the "middle" of the data.\newline 
+Principle surface is a smooth high dimensional curve build by generalization of principal curve.\newline 
+\end{frame}
+
+\begin{frame}
+\frametitle{Principle Curves and Surface}
+Take first curve $\textbf{f}^0$. We do principle curve procedure by projection and expectation step:\newline
+Projection: we project $x_i$ onto that curve $\textbf{f}^k$ to get an updated value of $\lambda^{k+1}$(distance between point and projected point).\newline
+Expectation:get set $\lambda^{k+1}$ from the projection step, and get a new principle curve by averaging all the points that project to nearby points on the curve.(Use some neighborhood measure)\newline
+We end the step by minimizing estimated reconstruction error.
+\end{frame}
+
+\begin{frame}
+\frametitle{Multilayer Autoassociative Neural Network}
+The network connects r input nodes to r output nodes that the output values are trained to approximate the inputs.\\
+It is a five-layer neural network like combing 2 Principal Curve methods. The first three layers project the original data on a curve, and the projected data values are then given by the activation values of the bottleneck node.\\
+The projection $\lambda_{\textbf{f}}$ defined for principal curves is allowed to be discontinuous.
+\end{frame}
+
+\begin{frame}
+\frametitle{Multilayer Autoassociative Neural Network}
 \begin{itemize}
-  \item Use Python to do data summary for Hospital Cost and Utilization Project (HCUP) data in XX (2011–16). (critical illness patients percentile, icu beds summary, etc.)
-  \item Use the expected value in contigency table to analyze two categorical variables, and showed the trend. Using partial F test for quantitative data based on categorical variable, showed statistical significance.
-  \item Compare critical illness(sepsis) to the whole dataset, showed sepsis patients that they will transferred to higher case volume hospitals, and had lower mortality rate. (confidence interval for sepsis patients far higher)
+  \item If we have ambiguity points for the data point x, then ANN must avoid becoming discontinuous at the ambiguity point by projecting x to the wrong point on the curve.
+  \item ANN cannot model any curves or surfaces that intersect themselves. 
 \end{itemize}
+For the reasons above, we need to be very cautious using ANN to model nonlinear PCA.
+\end{frame}
 
-\datedsubsection{\textbf{Associations between changes in olfactory perception and cognitive symptoms in mild traumatic brain injury}}{May. 2018 -- }
-\role{Second Author}{Collabrate with XXXXXXXX}
-Submitted to XXXX XXXXXXXX, Jan.2019
+
+\begin{frame}
+
+\frametitle{Nonlinear Manifold Learning}
+
+The goal of nonlinear manifold learning algorithm is to recover the full low-dimensional representation of an unknown nonlinear manifold $\mathcal{M}$ embedded in some high-dimensional space. \newline \newline
+When $\mathcal{M}$ is highly nonlinear (like S shape), the algorithm outperformed linear techniques.
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Nonlinear Manifold Learning}
+There are 3 steps in the algorithms
 \begin{itemize}
-  \item Use JMP to do categorical data analysis (Fisher's exact test) on variables may be connected to olfactory perception's changes in brain injury, report p-value and find expressive difficulties, memory deficits are relatedto olfactory deficits.
-  \item Use SAS to do logistic regression by backward-forward selection method to detect odds ratio's change on olfactory deficits and show results that like male are 24\% more likely to be in olfactory deficits and so on.
+  \item Step 1: each data point with neighborhood information and construct weighted graph having the datapoints as vertices.
+  \item Step 2: taking weighted neighborhood graph and transform into suitable input for embedding step.
+  \item Step 3: embedding step involves ($n \times n$)-eigenequation computation.
 \end{itemize}
+\end{frame}
 
-\datedsubsection{\textbf{Project: Determinants of Plasma Retinol and Beta-Carotene Levels
-}}{March. 2017 -- May. 2017}
-\role{Collabrate with xxxx xxxx and xxxx xxxx}{}
-In class project to learn multivariate linear regression
+\begin{frame}
+\frametitle{Nonlinear Manifold Learning}
+If a topological manifold $\mathcal{M}$ is continuously differentiable to any order, we call it a smooth (or differentiable) manifold.\newline
+We take $d^{\mathcal{M}}$ to be a manifold metric defined by
+\[d^{\mathcal{M}}(\textbf{y},\textbf{y'})=\inf_{c}\{L(c)|c\ is\ a\ curve\ in\ M\ which\ join \textbf{y}\ and \textbf{y'}\}\]
+L(c) is the arc-length of the curve c.
+\end{frame}
+
+\section{Methods}
+
+\begin{frame}
+\frametitle{Nonlinear Manifold Learning}
 \begin{itemize}
-  \item Use R to do variable selection(all variables, recoding for categorical variables, interaction term, polynomial term) based on AIC and other criteria, and selected a final model. (significant covariates are quetelet, $cholestrol^{2}$, smoking status)
-  \item Compared our final model to CMU's model, $R^{2}$ is enhanced from 0.2254 to 0.2802, which is a great enhancement,
-even if we did delete the influential case while they did. We also added interaction term and did higher order regression.
+  \item $I_{SOMAP}$
 \end{itemize}
+  The isometric feature mapping ($I_{SOMAP}$) algorithm (Tenenbaum, de Silva, Langford, 2000) assumes the smooth manifold $\mathcal{M}$ is a convex region of $\mathcal{R}^t\ (t<<r)$ and the embedding $\psi:\mathcal{M}\rightarrow\mathcal{X}$ is an isometry.
+\end{frame}
 
-% Reference Test
-%\datedsubsection{\textbf{Paper Title\cite{zaharia2012resilient}}}{May. 2015}
-%An xxx optimized for xxx\cite{verma2015large}
-%\begin{itemize}
-%  \item main contribution
-%\end{itemize}
+\begin{frame}
+\frametitle{$I_{SOMAP}$}
+  Two key ingredients in assumption:
+  \begin{block}{Isometry}
+  Geodesic distance is invariant under the map $\psi$. For $\textbf{y},\textbf{y'} \in \mathcal{M}$ the geodesic distance between the points equals the Euclidean distance between their corresponding coordinates $\textbf{x},\textbf{x'} \in \mathcal{X}$
+  \[d^{\mathcal{M}}(\textbf{y},\textbf{y'})=||\textbf{x}-\textbf{x'}||_{\mathcal{X}}\]
+  where $\textbf{y}=\phi(\textbf{x})$ and $\textbf{y'}=\phi(\textbf{x'})$
+  \end{block}
+  \begin{block}{Convexity}
+  The manifold $\mathcal{X}$ is a convex subset of $\mathcal{R}^t$
+  \end{block}
+  
+\end{frame}
 
-\section{\faHeartO\ Honors and Awards}
-\datedline{Teaching assistant scholarship, University of xxxx}{May. 2016 - Now}
+
+\begin{frame}
+\frametitle{$I_{SOMAP}$}
+ \includegraphics[scale=0.3]{swissroll.png}\\
+ $I_{SOMAP}$ extend MDS paradigm by preserve global geometry properties of underlying nonlinear manifold, and it does this by approximating all geodesic distances on the manifold. So $I_{SOMAP}$ is a global research to manifold learning. 
+\end{frame}
 
 
-%% Reference
-%\newpage
-%\bibliographystyle{IEEETran}
-%\bibliography{mycite}
+\begin{frame}
+\frametitle{$I_{SOMAP}$}
+\begin{itemize}
+  \item Neighborhood graph
+\end{itemize}
+Fixed integer K or an $\epsilon>0$, and calculate distance
+$d_{ij}^{\mathcal{X}}=d^{\mathcal{X}}(\textbf{x}_i,\textbf{x}_j)=||\textbf{x}-\textbf{x'}||_{\mathcal{X}}$
+between all pairs of data points $\textbf{x}_i,\textbf{x}_j$.
+Connecting each point either to its K nearest neighbors or to all points lying within a ball of radius $\epsilon$ of that point.\\
+We have weighted neighborhood graph $\mathcal{G}=\mathcal{G}(\mathcal{V},\mathcal{E})$, where the set of vertices $\mathcal{V}=\{\textbf{x}_1,...,\textbf{x}_n\}$ are input data points and the set of edges $\mathcal{E}=\{e_{ij}\}$\\
+The edge $e_{ij}$ join the neighboring point $\textbf{x}_i$ and $\textbf{x}_j$ has a weight $w_{ij}$ is given by the "distance" $d_{ij}^{\mathcal{X}}$ between those points. If there is no edge between a pair of points, the corresponding weight is zero.
+\end{frame}
+
+\begin{frame}
+\frametitle{$I_{SOMAP}$}
+\begin{itemize}
+  \item Compute graph distances
+\end{itemize}
+Estimate unknown true geodesic distances $\{d_{ij}^{\mathcal{M}}\}$, between pairs of points in $\mathcal{M}$ by graph distances, $\{d_{ij}^{\mathcal{G}}\}$, w.r.t graph $\mathcal{G}$.\\
+Not neighbor points are connected by a neighbor-to-neighbor links. The length of this path is to approximate the distance between its endpoints on the manifold.\\
+If data points sampled from probability distribution that is supported by the entie manifold, then, asymptotically, the estimate $d^{\mathcal{G}}$ converges to $d^{\mathcal{M}}$ if the manifold is flat(Bernstein, et., 2001).\\
+Floyd's algorithm (Floyd, 1962) is an efficient algorithm for computing the shortest path between every pair of vertices in a graph.
+\end{frame}
+
+\begin{frame}
+\frametitle{$I_{SOMAP}$}
+\begin{itemize}
+  \item Embedding via multidimensional scaling
+\end{itemize}
+Let $\textbf{D}^{\mathcal{G}}=(d_{ij}^{\mathcal{G}})$ be $(n \times n)$ matrix of graph distances. And we apply "classical" MDS to $\textbf{D}^{\mathcal{G}}$ to give the reconstructed data points in a t-dimensional feature space $\mathcal{Y}$, so the geodesic distances on $\mathcal{M}$ is preserved as much as possible:\\
+Form "doubly centered", symmetric, $(n \times n)$-matrix of squared graph distances,
+\[\textbf{A}_n^{\mathcal{G}}=-\frac{1}{2}\textbf{H}\textbf{S}^{\mathcal{G}}\textbf{H}\]
+where $\textbf{S}^{\mathcal{G}}=([d_{ij}^{\mathcal{G}}]^2)$,$\textbf{H}=\textbf{I}_n-n^{-1}\textbf{J}_n$ and $\textbf{J}_n=\textbf{1}_n\textbf{1}_{n}^T$.The matrix $\textbf{A}_n^{\mathcal{G}}$ will be nonnegative-definite of rank $t<n$.
+\end{frame}
+
+\begin{frame}
+\frametitle{$I_{SOMAP}$}
+\begin{itemize}
+  \item Embedding via multidimensional scaling
+\end{itemize}
+The embedding vectors $\{\hat{y}_i\}$ are chosen to minimize $||\textbf{A}_n^{\mathcal{G}}-\textbf{A}_n^{\mathcal{Y}}||$, where $\textbf{A}_n^{\mathcal{Y}}||$ we use $\textbf{S}^{\mathcal{Y}}=([d_{ij}^{\mathcal{Y}}]^2)$ replacing $\textbf{S}^{\mathcal{G}}$, and $d_{ij}^{\mathcal{Y}}=||\textbf{y}_i-\textbf{y}_j||$ is the Euclidean distance between $\textbf{y}_i$ and $\textbf{y}_j$. The optimal solution is given by the eigenvectors $\textbf{v}_1,...,\textbf{v}_t$ corresponding to the t largest eigenvalues,  $\lambda_1,...,\lambda_t$ of  $\textbf{A}_n^{\mathcal{G}}$\\
+The graph $\mathcal{G}$ is embedded into $\mathcal{Y}$ by the $(t \times n)$-matrix 
+\[ \hat{\textbf{Y}}=(\hat{\textbf{y}}_1,...,\hat{\textbf{y}}_n)=(\sqrt{\lambda_1}\textbf{v}_1,...,\sqrt{\lambda_t}\textbf{v}_t)^T\]
+The Euclidean distances between the n t-dimensional columns of $\hat{\textbf{Y}}$ are collected into the $(n \times n)$-matrix $\textbf{D}^{\mathcal{G}}$
+\end{frame}
+
+\begin{frame}
+\frametitle{$I_{SOMAP}$}
+A Measure of how closely the $I_{SOMAP}$ t-dimensional solution matrix $\textbf{D}^{\mathcal{Y}}$ approximates the matrix $\textbf{D}^{\mathcal{G}}$ of graph distances, we plot $1-R_t^2$ against dimensionality t, where $R_t^2=[corr(\textbf{D}^{\mathcal{Y}},\textbf{D}^{\mathcal{Y}})]^2$ is the squared correlation coefficient of all corresponding pairs of entries in the matrices $\textbf{D}^{\mathcal{Y}}$ and $\textbf{D}^{\mathcal{G}}$ and intrinsic dimensionality is taken to be that integer t at which an "elbow" appears in the plot.\newline \newline 
+$I_{SOMAP}$ algorithm has difficulty with manifolds that contain holes, or curvature, or not convex. If the data too noisy and K $\epsilon$ is not well-chosen, then $I_{SOMAP}$ should be able to tolerate moderate amounts of noise in the data.\\
+\end{frame}
+
+\begin{frame}
+\frametitle{$I_{SOMAP}$}
+ \begin{columns}
+\column{0.5\textwidth}
+\begin{minipage}[c][0.4\textheight][c]{\linewidth}
+  \centering
+  \includegraphics[width=0.8\linewidth]{Isomap.png}
+\end{minipage}
+\begin{minipage}[c][0.4\textheight][c]{\linewidth}
+  \centering
+  \includegraphics[width=0.8\linewidth]{LandmarkIsomap20000.png}
+\end{minipage}
+\column{0.5\textwidth}
+\begin{minipage}[c][0.4\textheight][c]{\linewidth}
+ 
+\includegraphics[width=0.8\linewidth]{LandmarkIsomap.png}
+ 
+\end{minipage}
+\begin{minipage}[c][0.4\textheight][c]{\linewidth}
+  \begin{itemize}
+\item{n=1000,K=7}  
+\item{n=1000,K=7,landmark point=50}
+\item{n=20000,K=7,landmark point=50}
+  \end{itemize}
+  
+  \end{minipage}
+\end{columns}
+\end{frame}
+
+\begin{frame}
+\frametitle{Landmark $I_{SOMAP}$}
+If the data set is very large, the performance of $I_{SOMAP}$ algorithm is significantly degraded by $\textbf{D}^{\mathcal{G}}$ and $\textbf{A}_n$\newline
+The researcher tries to eliminate redundancy by specifying a landmark subset of m of the n data points (de Silva and Tenenbaum, 2003).  If $\textbf{x}_i$ is designated as one of the m landmark points, we calculate only those distances between each of the n points and $\textbf{x}_i$. So there is a $(m \times n)$-matrix of distances. Usually m=50 works well.\\
+In the MDS embedding step, the object to preserve only those distances between all points and the subset of landmark points. 
+\end{frame}
+
+\begin{frame}
+\frametitle{Landmark $I_{SOMAP}$}
+Step 2 in landmark $I_{SOMAP}$ uses Dijkstra's algorithm (Dijkstra, 1959), which is faster than Floyd algorithm for computing graph distances and is generally preferred when the graph is sparse.\newline \newline
+Sometimes Dijkstra algorithm is recommended as a replacement for Floyd's algorithm in the original $I_{SOMAP}$ algorithm.
+\end{frame}
+
+\begin{frame}
+\frametitle{LLE}
+\begin{itemize}
+\item{Local Linear Embedding (LLE)}
+\end{itemize}
+Developed by Roweis and Saul, 2000, is used for nonlinear dimensionality reduction is similar in spirit to $I_{SOMAP}$ algorithm, but preserve local neighborhood information on the Riemannian manifold, we view LLE as a local approach.
+\end{frame}
+
+\begin{frame}
+\frametitle{LLE}
+\begin{itemize}
+  \item Nearest neighbor search
+\end{itemize}
+Fixed $K<<r$ and let $N_i^K$ be 'neighborhood' of $x_i$ that contains its only K nearest points, as measured by Euclidean distance. (K could be different for each $x_i$). \newline \newline
+The LLE algorithm is best served if the graph formed by linking each point to its neighbor is connected. If not connected, the LLE can be applied into subgraph separately.
+\end{frame}
+
+\begin{frame}
+\frametitle{LLE}
+\begin{itemize}
+  \item Constrained least-squares fits.
+\end{itemize}
+Reconstruct $x_i$ by $\hat{x}_i=\sum_{j=1}^n w_{ij}x_j$ where $w_{ij}$ is a scalar weight for $x_j$ with unit sum, $\sum_j w_{ij}=1$; if $x_l \not\in N_i^K$, then we set $w_{ij}=0$. Set $\textbf{W}=(w_{ij})$ to be $(n \times n)$ matrix of weights, find optimal weights $\{\hat{w}_{ij}\}$ by solving
+\[\hat{\textbf{W}}=arg\min_{\textbf{W}}\sum_{i=1}^n||x_i-\sum_{j=1}^n w_{ij}x_j||^2 \]
+\end{frame}
+
+\begin{frame}
+\frametitle{LLE}
+\begin{itemize}
+  \item Constrained least-squares fits.
+\end{itemize}
+For given point $x_i$, we write the summand of $\hat{\textbf{W}}$ as 
+\[||\sum_j w_{ij}(x_i-x_j)||^2=\textbf{w}_i^T\textbf{G}\textbf{w}_i\]
+where $\textbf{w}_i=(w_{ij},...,w_{in})^T$ and $\textbf{G}=(G_{jk})$,$G_{jk}=(x_i-x_j)^T(x_i-x_k)$\\
+Using the Lagrangean multiplier $\mu$, we minimize the function
+\[f(\textbf{w}_i)=\textbf{w}_i^T\textbf{G}\textbf{w}_i-\mu(\textbf{1}_n\textbf{w}_i-1)\]
+differentiate function w.r.t. $\textbf{w}_i$ and set result equal to zero, we get $\hat{\textbf{w}}_i = \frac{\mu}{2}\textbf{G}^{-1}\textbf{1}_n$, premultiply $\textbf{1}_n^r$ we have $\hat{\textbf{w}_i}=\frac{\textbf{G}^{-1}\textbf{1}_n}{\textbf{1}_n^r\textbf{G}^{-1}\textbf{1}_n}$
+\end{frame}
+
+\begin{frame}
+\frametitle{LLE}
+\begin{itemize}
+  \item Eigenproblem
+\end{itemize}
+Find the $(t \times n)$ matrix $\textbf{Y}=(\textbf{y}_1,...,\textbf{y}_n),t<<r$, and solve
+\[\hat{\textbf{Y}}=arg\min_{\textbf{Y}}\sum_{i=1}^n||\textbf{y}_i-\sum_{j=1}^n\hat{w}_{ij}\textbf{y}_j||^2\]
+subject to contraints $\sum_i \textbf{y}_i=\textbf{Y}\textbf{1}_n=\textbf{0}$ and $n^{-1}\sum_i\textbf{y}_i\textbf{y}_i^T=\textbf{I}_t$,
+We can write $\hat{\textbf{Y}}$ as 
+\[\hat{\textbf{Y}}=arg \min_{\textbf{Y}}tr\{\textbf{Y}\textbf{M}\textbf{Y}^T\}\]
+Where $\textbf{M}=(\textbf{I}_n-\hat{\textbf{W}})^T(\textbf{I}_n-\hat{\textbf{W}})$
+\end{frame}
+
+\begin{frame}
+\frametitle{LLE}
+\begin{itemize}
+  \item Eigenproblem
+\end{itemize}
+$tr\{\textbf{Y}\textbf{M}\textbf{Y}^T\}$ has global minimum given by eigenvectors corresponding to the smallest t+1 eigenvalues of $\textbf{M}$. So we can have 
+\[\hat{\textbf{Y}}=(\hat{\textbf{y}}_1,...,\hat{\textbf{y}}_n)=(\textbf{v}_{n-1},...,\textbf{v}_{n-t})^T\]
+where $\textbf{v}_{n-j}$ is the eigenvector corresponding to the (j+1)st smallest eigenvalue of $\textbf{M}$.
+\end{frame}
+
+\begin{frame}
+\frametitle{LLE}
+Because LLE preserves local properties of the underlying manifold, it is less introducing false connection in $\mathcal{G}$ and can successfully embed nonconvex manifolds. But it also has difficulty with manifolds that contains holes.
+\end{frame}
+
+\begin{frame}
+\frametitle{Laplacian Eigenmaps}
+Proposed by Belkin and Niyogi, 2002 and also have three steps:
+\begin{itemize}
+\item{Nearest-neighbor search}
+\end{itemize}
+Fix K and $\epsilon$, find K-neighborhood $N_i^K$ of point $x_i$ and let $x_j \in N_i^k$ iff $x_i \in N_j^k$, and for $\epsilon$-neighborhood $N_i^{\epsilon}$ iff $||x_i-x_j||<\epsilon$. And $N_i$ be the neighborhood of $x_i$.
+\end{frame}
+
+\begin{frame}
+\frametitle{Laplacian Eigenmaps}
+\begin{itemize}
+\item{Weighted adjacency matrix}
+\end{itemize}
+Defined $\textbf{W}=(w_{ij})$ and 
+\[w_{ij}=\left\{
+                \begin{array}{ll}
+                  exp\{-\frac{||x_i-x_j||^2}{2\sigma^2}\},\ if\ x_j\in N_i\\
+                  0,\ othwerwise\\
+                \end{array}
+              \right.\]
+The weight are determiend by the isotropic Gaussian Kernel, with scale parameter $\sigma$. Denote the resulting wighted graph by $\mathcal{G}$. If $\mathcal{G}$ is not connected, apply step 3 to each connected subgraph. 
+\end{frame}
+
+\begin{frame}
+\frametitle{Laplacian Eigenmaps}
+\begin{itemize}
+\item{Eigenproblem}
+\end{itemize}
+Embed into lower $(t \times n)$-matrix $\textbf{Y}=(\textbf{y}_1,...,\textbf{y}_n)$ and $\textbf{D}=(d_{ij})$ be the diagonal matrix  with $d_{ii}=\sum_{j \in N_{i}}w_{ij}=(\textbf{W}\textbf{1}_n)_i, i=1,2,...,n$, The $\textbf{L}=\textbf{D}-\textbf{W}$ is the graph Laplacian for the graph $\mathcal{G}$, then $\textbf{y}^T\textbf{L}\textbf{y}=\frac{1}{2}\sum_{i=1}^n\sum_{j=1}^n w_{ij}(y_i-y_j)^2$. $\textbf{L}$ can be regarded as an approximation to the continuous Laplace-Beltrami operator $\Delta$ defined on the manifold $\mathcal{M}$.
+Similar to what we have done in LLE, we find $\hat{\textbf{Y}}=(\hat{\textbf{y}}_1,...,\hat{\textbf{y}}_n)=(\textbf{v}_{n-1},...,\textbf{v}_{n-t})^T$, corresponding to the next t smallest eigenvalues, $\lambda_{n-1},...,\lambda_{n-t}$, of $\hat{\textbf{W}}=\textbf{D}^{-1/2}\textbf{W}\textbf{D}^{-1/2}$
+\end{frame}
+
+\begin{frame}
+\frametitle{Hessian Eigenmaps}
+Sometimes $I_{SOMAP}$ is being too restricted, sometimes we can't do a high dimensional space live on a low-dimensional manifold. So Hessian eigenmaps  will deal with the convexity assumption is violated (Donoho and Grimes, 2003).\\
+Change the requirements of $I_{SOMAP}$ into\\
+Local Isometry: only require isometric embedding in a neighborhood.\\
+Connected: parameter space $\Theta$ is open, connected subset of $\mathcal{R}^t$
+\end{frame}
+
+\begin{frame}
+\frametitle{Hessian Eigenmaps}
+In Hessian Eigenmaps, we first estimate Hessian Matrices, and performing eigen analysis on local Hessian Matrices like we have done before.
+\begin{itemize}
+\item{Find covariance matrix $\textbf{M}_i$ of K neighborhood-centerd points $x_j-\bar{x}_i$}
+\item{Find $\textbf{Z}_i$ be squares and cross-products of the columns of $\textbf{M}_i$ up tot he tth order in its columns, including column of 1s}
+\item{Gram-Schmidt orthonormalizaion to $\textbf{Z}_i$}
+\item{Transpose $\textbf{Z}_i$ to be $\hat{\textbf{H}}_i$}
+\item{$\hat{H}_{kl}=\sum_i\sum_j(\hat{\textbf{H}}_i)_{jk}(\hat{\textbf{H}}_i)_{jl}$ and $\hat{H}_{kl}$ smallest t+1 eigenvectors are estimate of $\textbf{Y}$}
+\end{itemize}
+\end{frame}
+\section{Simulation}
+
+\begin{frame}
+\frametitle{Simulation}
+Using helix dataset to do simulation.\\
+Suppose we have two random numbers $p_i$ and $q_i$ that were sampled from a uniform distribution with support
+[0, 1].For the helix dataset, the datapoint xi is contructed by computing \[x_i =[(2 + cos(8pi)) cos(pi), (2 + cos(8pi)) sin(pi), sin(8pi)]\].\\
+\includegraphics[width=0.4\linewidth]{helix.png}
+\end{frame}
+
+\begin{frame}
+\frametitle{Helix}
+ \begin{columns}
+\column{0.5\textwidth}
+\begin{minipage}[c][0.4\textheight][c]{\linewidth}
+  \centering
+  \includegraphics[width=0.8\linewidth]{helixPCA.png}
+\end{minipage}
+\begin{minipage}[c][0.4\textheight][c]{\linewidth}
+  \centering
+  \includegraphics[width=0.8\linewidth]{helixISOMAP.png}
+\end{minipage}
+\column{0.5\textwidth}
+\begin{minipage}[c][0.4\textheight][c]{\linewidth}
+ 
+\includegraphics[width=0.8\linewidth]{helixLandmarkISOMAP.png}
+ 
+\end{minipage}
+\begin{minipage}[c][0.4\textheight][c]{\linewidth}
+  \centering
+  \includegraphics[width=0.8\linewidth]{helixLE.png}
+\end{minipage}
+\end{columns}
+\end{frame}
+
+\begin{frame}
+\frametitle{Helix}
+ \begin{columns}
+\column{0.5\textwidth}
+\begin{minipage}[c][0.4\textheight][c]{\linewidth}
+  \centering
+  \includegraphics[width=0.8\linewidth]{helixLLE.png}
+\end{minipage}
+
+\column{0.5\textwidth}
+\begin{minipage}[c][0.4\textheight][c]{\linewidth}
+  \centering
+  \includegraphics[width=0.8\linewidth]{helixHLLE.png}
+\end{minipage}
+\end{columns}
+\end{frame}
+
+\begin{frame}
+\frametitle{Real data Analysis}
+Using COIL20 dataset to do simulation.\\
+It contains 20 objects. The images of each objects were taken 5 degrees apart as the object is rotated on a turntable and each object has 72 images. The size of each image is $32\times 32$ pixels, with 256 grey levels per pixel. Thus, each image is represented by a 1024-dimensional vector.\\
+\includegraphics[width=0.4\linewidth]{20objects.jpg}
+\end{frame}
+
+\begin{frame}
+\frametitle{Real data Analysis}
+First we do dimensional reduction, then we do classification on 20 object in the lower-dimensional dataset by LDA, QDA, 20-nn discriminant function .\\
+Cross-validation (do k=72 cross-validation, since data is large) error rate table for several method shows below:\\
+\tabcolsep=0.03cm
+\begin{table}[]
+\centering
+\caption{C-V Error Rate (smaller better)}
+\label{my-label}
+\begin{tabular}{|l|l|l|l|l|l|l|l|l|}
+\hline
+Method &None    & PCA    & KPCA   & $I_{SOMAP}$ & $LI_{SOMAP}$ & LLE    & Laplacian & HLLE   \\ \hline
+LDA &0.0569& 0.2688 & 0.7014 & 0.3160 & 0.3333  & 0.3521 & 0.3910    & 0.5806 \\ \hline
+QDA &0& 0.1521 & 0.6694 & 0.2104 & 0.2125  & 0.2528 & 0.3785    & 0.4701 \\ \hline
+20NN &0.0813& 0.1104 & 0.6493 & 0.1924 & 0.2007  & 0.2007 & 0.2361    & 0.3535 \\ \hline
+\end{tabular}
+\end{table}
+\end{frame}
+
+\section{Conclusion}
+
+\begin{frame}
+\frametitle{Conclusion}
+\begin{itemize}
+\item {When dealing with Swiss-Roll manifold, $I_{SOMAP}$ and Landmark $I_{SOMAP}$ is well performed when doing dimensional reduction, especially Landmark $I_{SOMAP}$ dealing with large n data.}
+\item {When Dealing with Helix dataset, it is a generated dataset, and the PCA method seems to be the best way to do dimensional reduction, LLE seems to be the worst way to do dimensional reduction.}
+\item {When dealing with the COIL20 dataset, we do classification after dimensional reduction, and according to the cross-validation error rate, the PCA seems to be the best way to do classification, and second is $I_{SOMAP}$, while KPCA (kernel gaussian) is the worst.}
+\end{itemize}
+\end{frame}
+
+\section{Reference}
+
+\begin{frame}
+\frametitle{Reference}
+\begin{itemize}
+\item L.J.P. van der Maaten, E.O. Postma, and H.J. van den Herik. Dimensionality Reduction: A Comparative Review. Tilburg University Technical Report, TiCC-TR 2009-005, 2009.
+\item Alan Julian Izenman. Modern Multivariate Statistical Techniques: Regression, Classification, and
+Manifold Learning. Springer, 2008.
+\item Tenenbaum JB, De Silva V, Langford JC. A global geometric framework for nonlinear dimensionality reduction.
+Science, 290, 2319-2323, 2000.
+\item Sam T. Roweis1 and Lawrence K. Saul, Nonlinear Dimensionality Reduction by Locally Linear Embedding.Science. 2000 
+\end{itemize}
+\end{frame}
+
+
 \end{document}
+
